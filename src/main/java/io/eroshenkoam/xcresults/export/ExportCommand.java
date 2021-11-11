@@ -98,6 +98,13 @@ public class ExportCommand implements Runnable {
         Files.createDirectories(outputPath);
 
         final Map<String, ExportMeta> testRefIds = new HashMap<>();
+        System.out.println("NODE: ");
+        System.out.println(node.toString());
+        if (Objects.nonNull(node)) {
+            System.out.println("Node NOT Null");
+        } else {
+            System.out.println("Node Null");
+        }
         for (JsonNode action : node.get(ACTIONS).get(VALUES)) {
             if (action.get(ACTION_RESULT).has(TEST_REF)) {
                 final ExportMeta meta = new ExportMeta();
@@ -219,6 +226,7 @@ public class ExportCommand implements Runnable {
 
     private JsonNode readSummary() {
         final ProcessBuilder builder = new ProcessBuilder();
+        System.out.println(inputPath.toAbsolutePath().toString());
         builder.command(
                 "xcrun",
                 "xcresulttool",
@@ -226,7 +234,9 @@ public class ExportCommand implements Runnable {
                 "--format", "json",
                 "--path", inputPath.toAbsolutePath().toString()
         );
-        return readProcessOutput(builder);
+        JsonNode node = readProcessOutput(builder);
+        System.out.println(node);
+        return node;
     }
 
     private JsonNode getReference(final String id) {
@@ -261,8 +271,12 @@ public class ExportCommand implements Runnable {
             final Process process = builder.start();
             try (InputStream input = process.getInputStream()) {
                 if (Objects.nonNull(input)) {
+                    System.out.println("Stream NOT Null");
                     return mapper.readTree(input);
                 } else {
+                    System.out.println("Stream Null");
+                    System.out.println(input);
+                    System.out.println(builder);
                     return null;
                 }
             }
